@@ -5,7 +5,8 @@ import os
 from PIL import Image 
 import numpy as np
 from pydub import AudioSegment
-
+import librosa
+import numpy as np
 
 def get_category_from_path(input_video_path):
     '''
@@ -84,6 +85,17 @@ def select_videos(base_dir, input_video_path, other_categories):
     return selected_videos
 
 
+def select_videos_ms3(all_video_path, input_video_path):
+    
+    selected_videos = [input_video_path]
+    videos_list = os.listdir(all_video_path)
+    other_videos = list(set(videos_list) - set(selected_videos))
+    temp_videos_name = random.sample(other_videos, 3)
+    for temp_video in temp_videos_name:
+        selected_videos.append(os.path.join(all_video_path, temp_video))
+
+    return selected_videos
+
 def process_frame(temp_frame, selected_videos, frames_with_audio_and_mask):
     selected_frames, selected_labels, selected_audio = [], [], []
     for i, temp_video in enumerate(selected_videos):
@@ -97,6 +109,8 @@ def process_frame(temp_frame, selected_videos, frames_with_audio_and_mask):
         else:
             selected_labels.append(Image.new('L', (256, 256), 0))
     return selected_frames, selected_labels, selected_audio
+
+
 
 
 def stitch_images(images, labels, positions, min_width, min_height):
@@ -149,6 +163,31 @@ def stitch_frames(base_dir, input_video_path, folder, save_floder_name, num_with
     return None
 
 
+def stitch_frames_ms3(base_dir, input_video_path, folder, save_floder_name, num_with_audio_and_mask=random.randint(1, 4)):
+    
+    selected_videos = select_videos_ms3(base_dir, input_video_path)
+    min_width, min_height = 112, 112
+    positions = [(0, 0), (min_width, 0), (0, min_height), (min_width, min_height)]
+    random.shuffle(positions)
+
+    frames = os.listdir(selected_videos[0])
+    frames_with_audio_and_mask = random.sample(range(4), num_with_audio_and_mask)
+
+    for temp_frame in frames:
+        selected_frames, selected_labels, selected_audio = process_frame(temp_frame, selected_videos, frames_with_audio_and_mask)
+
+        images = [Image.open(frame) for frame in selected_frames]
+        stitched_image, stitched_label = stitch_images(images, selected_labels, positions, min_width, min_height)
+        
+        save_stitched_images(stitched_image, stitched_label, input_video_path, temp_frame, folder, save_floder_name)
+        
+    ori_audio_path = get_audio_path(input_video_path)
+    audio_save_path = ori_audio_path.replace('/avsbench_data/', save_floder_name)
+
+    mix_audio_files(selected_audio, audio_save_path)
+
+
+    return None
 
 def mix_audio_files(audio_file_paths, output_path):
     """
@@ -188,4 +227,30 @@ def mix_audio_files(audio_file_paths, output_path):
     
     # Export the mixed audio
     mixed_audio.export(output_path, format="wav")
-    print(f"Mixed audio saved to {output_path}")
+    print(f"Mixed audio saved to {output_path}")    
+
+
+def extract_log_mel_features(wav_file, n_mels=128, n_fft=2048, hop_length=512):
+    """
+    Extract log-mel features from a WAV file.
+    
+    Args:
+    wav_file (str): Path to the WAV file.
+    n_mels (int): Number of mel bands to generate.
+    n_fft (int): Length of the FFT window.
+    hop_length (int): Number of samples between successive frames.
+    
+    Returns:
+    numpy.ndarray: Log-mel spectrogram.
+    """
+    # Load the audio file
+    y, sr = librosa.load(wav_file)
+    
+    # Compute mel spectrogram
+    mel_spectrogram = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels, 
+                                                     n_fft=n_fft, hop_length=hop_length)
+    
+    # Convert to log scale
+    log_mel_spectrogram = librosa.power_to_db(mel_spectrogram, ref=np.max)
+    
+    return log_mel_spectrogram
