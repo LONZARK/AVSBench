@@ -4,6 +4,3 @@ __pycache__
 *.txt
 *.log
 *.png
-
-./train_logs/
-./test_logs/
