@@ -28,7 +28,7 @@ cfg.DATA = edict()
 cfg.DATA.ANNO_CSV = "/mnt/data1/jiali/avsbench_data/Single-source/s4_meta_data.csv"
 cfg.DATA.DIR_IMG = "/mnt/data1/jiali/avsbench_data/Single-source/s4_data/visual_frames"
 cfg.DATA.DIR_AUDIO_LOG_MEL = "/mnt/data1/jiali/avsbench_data/Single-source/s4_data/audio_log_mel"
-cfg.DATA.DIR_MASK = "/mnt/data1/jiali/avsbench_data/Single-source/s4_data/gt_masks"
+cfg.DATA.DIR_MASK = "/mnt/data1/jiali/avsbench_data/Single-source/s4_data/s4_data/gt_masks"
 cfg.DATA.IMG_SIZE = (224, 224)
 
 # avsbench - s4
