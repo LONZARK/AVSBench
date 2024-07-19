@@ -53,13 +53,31 @@ def get_gt_mask_path(syn_frame):
         modified_gt_path = '/'.join(path_parts)  # Join the path parts back together
         return modified_gt_path
 
+def get_gt_mask_path_ms3(syn_frame, folder):
+    gt_path = syn_frame.replace('/visual_frames/', f'/gt_masks/{folder}/')
+
+    # Check if the gt_path exists
+    if os.path.exists(gt_path):
+        return gt_path
+    else:
+        # Modify the file name to end with '_1.png'
+        path_parts = gt_path.split('/')
+        filename = path_parts[-1]  # Get the last part of the path which is the filename
+        new_filename = '_'.join(filename.split('_')[:-1]) + '_1.png'  # Replace the last part after '_' with '1.png'
+        path_parts[-1] = new_filename  # Replace the filename in the path_parts
+        modified_gt_path = '/'.join(path_parts)  # Join the path parts back together
+        return modified_gt_path
+    
+
 def get_audio_path(temp_video):
     
     audio_wav = temp_video.replace('/visual_frames/', '/audio_wav/') + '.wav'
     return audio_wav
 
-
-
+def get_audio_path_ms3(temp_video, folder):
+    
+    audio_wav = temp_video.replace('/visual_frames/', f'/audio_wav/{folder}/') + '.wav'
+    return audio_wav
 
 
 def select_categories(base_dir, input_image_category):
@@ -85,16 +103,53 @@ def select_videos(base_dir, input_video_path, other_categories):
     return selected_videos
 
 
-def select_videos_ms3(all_video_path, input_video_path):
+# def select_videos_ms3(all_video_path, input_video_path):
     
+#     selected_videos = [input_video_path]
+#     videos_list = os.listdir(all_video_path)
+#     other_videos = list(set(videos_list) - set(selected_videos))
+#     temp_videos_name = random.sample(other_videos, 3)
+#     for temp_video in temp_videos_name:
+#         selected_videos.append(os.path.join(all_video_path, temp_video))
+
+#     return selected_videos
+
+import pandas as pd
+
+def get_split_from_video_id(csv_file, video_id):
+    # Read the CSV file into a DataFrame
+    df = pd.read_csv(csv_file)
+    
+    # Search for the row with the given video_id
+    row = df[df['video_id'] == video_id]
+    
+    # If the row is found, return the split value
+    if not row.empty:
+        return row['split'].values[0]
+    else:
+        return None
+
+def select_videos_ms3(all_video_path, input_video_path, folder, csv_file):
+
+    # Extract split from input_video_path
+    path_parts = input_video_path.split('/')
+    video_id = path_parts[-1]
+    split = get_split_from_video_id(csv_file, video_id)
+
     selected_videos = [input_video_path]
-    videos_list = os.listdir(all_video_path)
+
+    # Read the CSV file to filter videos in the same split, Filter videos to include only those in the same split
+    df = pd.read_csv(csv_file)
+    same_split_videos = df[df['split'] == split]['video_id'].tolist()
+    videos_list = [os.path.join(all_video_path,video) for video in os.listdir(all_video_path) if video in same_split_videos]
     other_videos = list(set(videos_list) - set(selected_videos))
+    
     temp_videos_name = random.sample(other_videos, 3)
     for temp_video in temp_videos_name:
         selected_videos.append(os.path.join(all_video_path, temp_video))
 
-    return selected_videos
+    return  selected_videos
+
 
 def process_frame(temp_frame, selected_videos, frames_with_audio_and_mask):
     selected_frames, selected_labels, selected_audio = [], [], []
@@ -111,6 +166,43 @@ def process_frame(temp_frame, selected_videos, frames_with_audio_and_mask):
     return selected_frames, selected_labels, selected_audio
 
 
+def process_frame_ms3(temp_frame, selected_videos, folder, frames_with_audio_and_mask):
+    selected_frames, selected_labels, selected_audio = [], [], []
+    for i, temp_video in enumerate(selected_videos):
+        syn_frame = get_corresponding_frame(temp_frame, temp_video)
+        selected_frames.append(syn_frame)
+        
+        if i in frames_with_audio_and_mask:
+            temp_image_label_path = get_gt_mask_path_ms3(syn_frame, folder)
+            selected_labels.append(Image.open(temp_image_label_path).convert("L"))
+            selected_audio.append(get_audio_path_ms3(temp_video, folder))
+        else:
+            selected_labels.append(Image.new('L', (256, 256), 0))
+
+    def modify_paths(paths):
+        modified_paths = []
+        for path in paths:
+            # Split the path to get the directory and filename
+            path_parts = path.split('/')
+            filename = path_parts[-1]
+            
+            # Find the position of the last underscore before the number
+            pos = filename.rfind('_')
+            
+            # Insert '.mp4' before the last underscore and the number
+            new_filename = filename[:pos] + '.mp4' + filename[pos:]
+            
+            # Reconstruct the full path
+            path_parts[-1] = new_filename
+            modified_path = '/'.join(path_parts)
+            
+            # Add the modified path to the list
+            modified_paths.append(modified_path)
+        
+        return modified_paths
+
+    modified_selected_frames = modify_paths(selected_frames)
+    return modified_selected_frames, selected_labels, selected_audio
 
 
 def stitch_images(images, labels, positions, min_width, min_height):
@@ -122,14 +214,46 @@ def stitch_images(images, labels, positions, min_width, min_height):
     return stitched_image, stitched_label
 
 
+def remove_mp4_from_paths(paths):
+    cleaned_paths = []
+    for path in paths:
+        # Split the path to get the directory and filename
+        path_parts = path.split('/')
+        filename = path_parts[-1]
+        
+        # Remove the .mp4 from the filename
+        new_filename = filename.replace('.mp4', '')
+
+        # Reconstruct the full path
+        path_parts[-1] = new_filename
+        cleaned_path = '/'.join(path_parts)
+        
+        # Add the cleaned path to the list
+        cleaned_paths.append(cleaned_path)
+    
+    return cleaned_paths
+
 def save_stitched_images(stitched_image, stitched_label, input_video_path, temp_frame, folder, save_floder_name):
     syn_video_savedir = input_video_path.replace('/avsbench_data/', save_floder_name)
     stitched_image.save(os.path.join(syn_video_savedir, temp_frame))
 
     syn_gt_savedir = syn_video_savedir.replace('/visual_frames/', '/gt_masks/')
     gt_mask_path = os.path.join(syn_gt_savedir, temp_frame)
+
     if folder == 'train':
-        gt_mask_path = gt_mask_path.rsplit('_', 1)[0] + '_1.png'      
+        gt_mask_path = gt_mask_path.rsplit('_', 1)[0] + '_1.png'  
+    stitched_label.save(gt_mask_path)
+
+def save_stitched_images_ms3(stitched_image, stitched_label, input_video_path, temp_frame, folder, save_floder_name):
+    syn_video_savedir = input_video_path.replace('/avsbench_data/', save_floder_name)
+    stitched_image.save(os.path.join(syn_video_savedir, temp_frame))
+
+    syn_gt_savedir = syn_video_savedir.replace('/visual_frames/', f'/gt_masks/{folder}/')
+    gt_mask_path = os.path.join(syn_gt_savedir, temp_frame)
+
+    if folder == 'train':
+        gt_mask_path = gt_mask_path.rsplit('_', 1)[0] + '_1.png'  
+        gt_mask_path = remove_mp4_from_paths([gt_mask_path])[0]
     stitched_label.save(gt_mask_path)
 
 def stitch_frames(base_dir, input_video_path, folder, save_floder_name, num_with_audio_and_mask=random.randint(1, 4)):
@@ -163,9 +287,9 @@ def stitch_frames(base_dir, input_video_path, folder, save_floder_name, num_with
     return None
 
 
-def stitch_frames_ms3(base_dir, input_video_path, folder, save_floder_name, num_with_audio_and_mask=random.randint(1, 4)):
+def stitch_frames_ms3(base_dir, input_video_path, folder, csv_file, save_floder_name,  num_with_audio_and_mask=random.randint(1, 4)):
     
-    selected_videos = select_videos_ms3(base_dir, input_video_path)
+    selected_videos = select_videos_ms3(base_dir, input_video_path, folder, csv_file)
     min_width, min_height = 112, 112
     positions = [(0, 0), (min_width, 0), (0, min_height), (min_width, min_height)]
     random.shuffle(positions)
@@ -174,14 +298,13 @@ def stitch_frames_ms3(base_dir, input_video_path, folder, save_floder_name, num_
     frames_with_audio_and_mask = random.sample(range(4), num_with_audio_and_mask)
 
     for temp_frame in frames:
-        selected_frames, selected_labels, selected_audio = process_frame(temp_frame, selected_videos, frames_with_audio_and_mask)
 
+        selected_frames, selected_labels, selected_audio = process_frame_ms3(temp_frame, selected_videos, folder, frames_with_audio_and_mask)
         images = [Image.open(frame) for frame in selected_frames]
         stitched_image, stitched_label = stitch_images(images, selected_labels, positions, min_width, min_height)
+        save_stitched_images_ms3(stitched_image, stitched_label, input_video_path, temp_frame, folder, save_floder_name)
         
-        save_stitched_images(stitched_image, stitched_label, input_video_path, temp_frame, folder, save_floder_name)
-        
-    ori_audio_path = get_audio_path(input_video_path)
+    ori_audio_path = get_audio_path_ms3(input_video_path, folder)
     audio_save_path = ori_audio_path.replace('/avsbench_data/', save_floder_name)
 
     mix_audio_files(selected_audio, audio_save_path)
@@ -227,7 +350,6 @@ def mix_audio_files(audio_file_paths, output_path):
     
     # Export the mixed audio
     mixed_audio.export(output_path, format="wav")
-    print(f"Mixed audio saved to {output_path}")    
 
 
 def extract_log_mel_features(wav_file, n_mels=128, n_fft=2048, hop_length=512):
