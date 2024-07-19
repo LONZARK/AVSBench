@@ -8,7 +8,7 @@ import argparse
 import logging
 
 from config import cfg
-from dataloader import S4Dataset
+from dataloader import S4Dataset, S4Dataset_avsbench, S4Dataset_synthesis_avsbench_random4
 from torchvggish import vggish
 from loss import IouSemanticAwareLoss
 
