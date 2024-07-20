@@ -25,11 +25,27 @@ cfg.TRAIN.PRETRAINED_PVTV2_PATH = "../../pretrained_backbones/pvt_v2_b5.pth"
 ###############################
 # DATA
 cfg.DATA = edict()
-cfg.DATA.ANNO_CSV = "../../avsbench_data/Single-source/s4_meta_data.csv"
-cfg.DATA.DIR_IMG = "../../avsbench_data/Single-source/s4_data/visual_frames"
-cfg.DATA.DIR_AUDIO_LOG_MEL = "../../avsbench_data/Single-source/s4_data/audio_log_mel"
-cfg.DATA.DIR_MASK = "../../avsbench_data/Single-source/s4_data/gt_masks"
+cfg.DATA.ANNO_CSV = "/mnt/data1/jiali/avsbench_data/Single-source/s4_meta_data.csv"
+cfg.DATA.DIR_IMG = "/mnt/data1/jiali/avsbench_data/Single-source/s4_data/visual_frames"
+cfg.DATA.DIR_AUDIO_LOG_MEL = "/mnt/data1/jiali/avsbench_data/Single-source/s4_data/audio_log_mel"
+cfg.DATA.DIR_MASK = "/mnt/data1/jiali/avsbench_data/Single-source/s4_data/gt_masks"
 cfg.DATA.IMG_SIZE = (224, 224)
+
+# avsbench - s4
+cfg.DATA_avsbench = edict()
+cfg.DATA_avsbench.ANNO_CSV = "/mnt/data1/jiali/avsbench_data/Single-source/s4_meta_data.csv"
+cfg.DATA_avsbench.DIR_IMG = "/mnt/data1/jiali/avsbench_data/Single-source/s4_data/visual_frames"
+cfg.DATA_avsbench.DIR_AUDIO_LOG_MEL = "/mnt/data1/jiali/avsbench_data/Single-source/s4_data/audio_log_mel"
+cfg.DATA_avsbench.DIR_MASK = "/mnt/data1/jiali/avsbench_data/Single-source/s4_data/gt_masks"
+cfg.DATA_avsbench.IMG_SIZE = (224, 224)
+
+# synthesis_avsbench_random4 - s4
+cfg.DATA_synthesis_avsbench_random4 = edict()
+cfg.DATA_synthesis_avsbench_random4.ANNO_CSV = "/mnt/data1/jiali/avsbench_synthesis_visual_random4/Single-source/s4_meta_data.csv"  # 
+cfg.DATA_synthesis_avsbench_random4.DIR_IMG = "/mnt/data1/jiali/avsbench_synthesis_visual_random4/Single-source/s4_data/visual_frames"
+cfg.DATA_synthesis_avsbench_random4.DIR_AUDIO_LOG_MEL = "/mnt/data1/jiali/avsbench_synthesis_visual_random4/Single-source/s4_data/audio_log_mel"
+cfg.DATA_synthesis_avsbench_random4.DIR_MASK = "/mnt/data1/jiali/avsbench_synthesis_visual_random4/Single-source/s4_data/gt_masks"
+cfg.DATA_synthesis_avsbench_random4.IMG_SIZE = (224, 224)
 ###############################
 
 

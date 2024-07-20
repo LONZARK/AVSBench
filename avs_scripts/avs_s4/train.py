@@ -8,7 +8,7 @@ import argparse
 import logging
 
 from config import cfg
-from dataloader import S4Dataset
+from dataloader import S4Dataset, S4Dataset_avsbench, S4Dataset_synthesis_avsbench_random4, S4Dataset_mix
 from torchvggish import vggish
 from loss import IouSemanticAwareLoss
 
@@ -131,13 +131,32 @@ if __name__ == "__main__":
     audio_backbone.eval()
 
     # Data
-    train_dataset = S4Dataset('train')
+    # ======================================================
+    # set data for curriculum learning, which set the model exposed to training examples in a specific order that starts from 
+    # easier examples and gradually progresses to more diffcult ones.
+
+    # # The following is single learning stage - easy data(avsbench) for all epochs.
+    # train_dataset = S4Dataset('train')
+    # train_dataloader = torch.utils.data.DataLoader(train_dataset,
+    #                                                     batch_size=args.train_batch_size,
+    #                                                     shuffle=True,
+    #                                                     num_workers=args.num_workers,
+    #                                                     pin_memory=True)
+    # max_step = (len(train_dataset) // args.train_batch_size) * args.max_epoches
+
+    # The following is curriculum learning, based on the setting on paper[Cooperative Learning of Audio and Video Models from 
+    # Self-Supervised Synchronization], we can set two learning stage: first half epochs with easy samples only, and second 
+    # learning stage with 75% easy + 25% hard mixed datas applied later.
+    train_dataset = S4Dataset_mix('train', easy_ratio=1.0)
     train_dataloader = torch.utils.data.DataLoader(train_dataset,
                                                         batch_size=args.train_batch_size,
                                                         shuffle=True,
                                                         num_workers=args.num_workers,
                                                         pin_memory=True)
     max_step = (len(train_dataset) // args.train_batch_size) * args.max_epoches
+
+    # ======================================================
+
 
     val_dataset = S4Dataset('val')
     val_dataloader = torch.utils.data.DataLoader(val_dataset,
@@ -159,7 +178,21 @@ if __name__ == "__main__":
     global_step = 0
     miou_list = []
     max_miou = 0
+
+    trainsition_epoch = args.max_epoches // 2
+
     for epoch in range(args.max_epoches):
+
+        # # Gradually increase the proportion of hard data
+        # new_easy_ratio = max(0.25, 0.75 - epoch * 0.05)
+        # train_dataset.easy_ratio = new_easy_ratio
+        # train_dataset.update_dataset()
+
+        # if epoch == trainsition_epoch:
+        #     train_dataset.easy_ratio = 0.75
+        #     train_dataset.update_dataset()
+        #     print(f'Transitioning to mixed difficulty training at epoch {epoch + 1}')
+
         for n_iter, batch_data in enumerate(train_dataloader):
             imgs, audio, mask = batch_data # [bs, 5, 3, 224, 224], [bs, 5, 1, 96, 64], [bs, 1, 1, 224, 224]
 
