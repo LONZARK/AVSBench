@@ -53,8 +53,6 @@ if __name__ == "__main__":
 
     parser.add_argument("--weights", type=str, default='', help='path of trained model')
     parser.add_argument('--log_dir', default='./train_logs', type=str)
-    parser.add_argument('--easy_ratio', default=1.0, type=float)
-
 
     args = parser.parse_args()
 
@@ -190,10 +188,10 @@ if __name__ == "__main__":
         # train_dataset.easy_ratio = new_easy_ratio
         # train_dataset.update_dataset()
 
-        if epoch == trainsition_epoch:
-            train_dataset.easy_ratio = args.easy_ratio
-            train_dataset.update_dataset()
-            logger.info('Transitioning to mixed difficulty training at epoch {}'.format(epoch))
+        # if epoch == trainsition_epoch:
+        #     train_dataset.easy_ratio = 0.75
+        #     train_dataset.update_dataset()
+        #     print(f'Transitioning to mixed difficulty training at epoch {epoch + 1}')
 
         for n_iter, batch_data in enumerate(train_dataloader):
             imgs, audio, mask = batch_data # [bs, 5, 3, 224, 224], [bs, 5, 1, 96, 64], [bs, 1, 1, 224, 224]

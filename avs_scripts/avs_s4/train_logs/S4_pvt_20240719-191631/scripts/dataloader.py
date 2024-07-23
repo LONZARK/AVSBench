@@ -172,7 +172,7 @@ class S4Dataset_synthesis_avsbench_random4(Dataset):
 
 class S4Dataset_mix(Dataset):
     """Dataset for single sound source segmentation"""
-    def __init__(self, split='train', easy_ratio=1.0):
+    def __init__(self, split='train', easy_ratio=0.8):
         super(S4Dataset_mix, self).__init__()
         self.split = split
         self.easy_ratio = easy_ratio # ratio of original data in the mix

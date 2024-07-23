@@ -8,7 +8,7 @@ import argparse
 import logging
 
 from config import cfg
-from dataloader import MS3Dataset, MS3Dataset_mix
+from dataloader import S4Dataset, S4Dataset_avsbench, S4Dataset_synthesis_avsbench_random4, S4Dataset_mix
 from torchvggish import vggish
 from loss import IouSemanticAwareLoss
 
@@ -29,8 +29,8 @@ class audio_extractor(torch.nn.Module):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--session_name", default="MS3", type=str, help="the MS3 setting")
+    parser = argparse.ArgumentParser()    
+    parser.add_argument("--session_name", default="S4", type=str, help="the S4 setting")
     parser.add_argument("--visual_backbone", default="resnet", type=str, help="use resnet50 or pvt-v2 as the visual backbone")
 
     parser.add_argument("--train_batch_size", default=4, type=int)
@@ -40,25 +40,21 @@ if __name__ == "__main__":
     parser.add_argument("--num_workers", default=8, type=int)
     parser.add_argument("--wt_dec", default=5e-4, type=float)
 
-    parser.add_argument('--masked_av_flag', action='store_true', default=False, help='additional sa/masked_va loss for five frames')
+
+    parser.add_argument('--sa_loss_flag', action='store_true', default=False, help='additional loss for last four frames')
     parser.add_argument("--lambda_1", default=0, type=float, help='weight for balancing l4 loss')
-    parser.add_argument("--masked_av_stages", default=[], nargs='+', type=int, help='compute sa/masked_va loss in which stages: [0, 1, 2, 3]')
-    parser.add_argument('--threshold_flag', action='store_true', default=False, help='whether thresholding the generated masks')
+    parser.add_argument("--sa_loss_stages", default=[], nargs='+', type=int, help='compute sa loss in which stages: [0, 1, 2, 3')
     parser.add_argument("--mask_pooling_type", default='avg', type=str, help='the manner to downsample predicted masks')
-    parser.add_argument('--norm_fea_flag', action='store_true', default=False, help='normalize audio-visual features')
-    parser.add_argument('--closer_flag', action='store_true', default=False, help='use closer loss for masked_va loss')
-    parser.add_argument('--euclidean_flag', action='store_true', default=False, help='use euclidean distance for masked_va loss')
-    parser.add_argument('--kl_flag', action='store_true', default=False, help='use kl loss for masked_va loss')
 
-    parser.add_argument("--load_s4_params", action='store_true', default=False, help='use S4 parameters for initilization')
-    parser.add_argument("--trained_s4_model_path", type=str, default='', help='pretrained S4 model')
-
-    parser.add_argument("--tpavi_stages", default=[], nargs='+', type=int, help='add tpavi block in which stages: [0, 1, 2, 3]')
+    parser.add_argument("--tpavi_stages", default=[], nargs='+', type=int, help='add tpavi block in which stages: [0, 1, 2, 3')
     parser.add_argument("--tpavi_vv_flag", action='store_true', default=False, help='visual-visual self-attention')
     parser.add_argument("--tpavi_va_flag", action='store_true', default=False, help='visual-audio cross-attention')
 
+
     parser.add_argument("--weights", type=str, default='', help='path of trained model')
     parser.add_argument('--log_dir', default='./train_logs', type=str)
+    parser.add_argument('--easy_ratio', default=1.0, type=float)
+
 
     args = parser.parse_args()
 
@@ -126,16 +122,9 @@ if __name__ == "__main__":
                                         tpavi_va_flag=args.tpavi_va_flag)
     model = torch.nn.DataParallel(model).cuda()
     model.train()
-    logger.info("==> Total params: %.2fM" % ( sum(p.numel() for p in model.parameters()) / 1e6))
 
-    # load pretrained S4 model
-    if args.load_s4_params: # fine-tune single sound source segmentation model
-        model_dict = model.state_dict()
-        s4_state_dicts = torch.load(args.trained_s4_model_path)
-        state_dict = {'module.' + k : v for k, v in s4_state_dicts.items() if 'module.' + k in model_dict.keys()}
-        model_dict.update(state_dict)
-        model.load_state_dict(model_dict)
-        logger.info("==> Reload pretrained S4 model from %s"%(args.trained_s4_model_path))
+    # for k, v in model.named_parameters():
+    #         print(k, v.requires_grad)
 
     # video backbone
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -144,14 +133,12 @@ if __name__ == "__main__":
     audio_backbone.eval()
 
     # Data
-    train_dataset = MS3Dataset('train')
-    # Data
     # ======================================================
     # set data for curriculum learning, which set the model exposed to training examples in a specific order that starts from 
     # easier examples and gradually progresses to more diffcult ones.
 
     # # The following is single learning stage - easy data(avsbench) for all epochs.
-    # train_dataset = MS3Dataset('train')
+    # train_dataset = S4Dataset('train')
     # train_dataloader = torch.utils.data.DataLoader(train_dataset,
     #                                                     batch_size=args.train_batch_size,
     #                                                     shuffle=True,
@@ -162,7 +149,7 @@ if __name__ == "__main__":
     # The following is curriculum learning, based on the setting on paper[Cooperative Learning of Audio and Video Models from 
     # Self-Supervised Synchronization], we can set two learning stage: first half epochs with easy samples only, and second 
     # learning stage with 75% easy + 25% hard mixed datas applied later.
-    train_dataset = MS3Dataset_mix('train', easy_ratio=1.0)
+    train_dataset = S4Dataset_mix('train', easy_ratio=1.0)
     train_dataloader = torch.utils.data.DataLoader(train_dataset,
                                                         batch_size=args.train_batch_size,
                                                         shuffle=True,
@@ -170,7 +157,10 @@ if __name__ == "__main__":
                                                         pin_memory=True)
     max_step = (len(train_dataset) // args.train_batch_size) * args.max_epoches
 
-    val_dataset = MS3Dataset('val')
+    # ======================================================
+
+
+    val_dataset = S4Dataset('val')
     val_dataloader = torch.utils.data.DataLoader(val_dataset,
                                                         batch_size=args.val_batch_size,
                                                         shuffle=False,
@@ -181,9 +171,8 @@ if __name__ == "__main__":
     model_params = model.parameters()
     optimizer = torch.optim.Adam(model_params, args.lr)
     avg_meter_total_loss = pyutils.AverageMeter('total_loss')
-    avg_meter_sa_loss = pyutils.AverageMeter('sa_loss')
     avg_meter_iou_loss = pyutils.AverageMeter('iou_loss')
-
+    avg_meter_sa_loss = pyutils.AverageMeter('sa_loss')
     avg_meter_miou = pyutils.AverageMeter('miou')
 
     # Train
@@ -202,29 +191,31 @@ if __name__ == "__main__":
         # train_dataset.update_dataset()
 
         if epoch == trainsition_epoch:
-            train_dataset.easy_ratio = 0.75
+            train_dataset.easy_ratio = args.easy_ratio
             train_dataset.update_dataset()
-            print(f'Transitioning to mixed difficulty training at epoch {epoch + 1}')
+            logger.info('Transitioning to mixed difficulty training at epoch {}'.format(epoch))
 
         for n_iter, batch_data in enumerate(train_dataloader):
-            imgs, audio, mask, _ = batch_data # [bs, 5, 3, 224, 224], [bs, 5, 1, 96, 64], [bs, 5 or 1, 1, 224, 224]
+            imgs, audio, mask = batch_data # [bs, 5, 3, 224, 224], [bs, 5, 1, 96, 64], [bs, 1, 1, 224, 224]
 
             imgs = imgs.cuda()
             audio = audio.cuda()
             mask = mask.cuda()
             B, frame, C, H, W = imgs.shape
             imgs = imgs.view(B*frame, C, H, W)
-            mask_num = 5
-            mask = mask.view(B*mask_num, 1, H, W)
+            mask = mask.view(B, H, W)
             audio = audio.view(-1, audio.shape[2], audio.shape[3], audio.shape[4]) # [B*T, 1, 96, 64]
             with torch.no_grad():
                 audio_feature = audio_backbone(audio) # [B*T, 128]
 
-            output, v_map_list, a_fea_list = model(imgs, audio_feature) # [bs*5, 1, 224, 224]
-            loss, loss_dict = IouSemanticAwareLoss(output, mask, a_fea_list, v_map_list, \
-                                        sa_loss_flag=args.masked_av_flag, lambda_1=args.lambda_1, count_stages=args.masked_av_stages, \
-                                        mask_pooling_type=args.mask_pooling_type, threshold=args.threshold_flag, norm_fea=args.norm_fea_flag, \
-                                        closer_flag=args.closer_flag, euclidean_flag=args.euclidean_flag, kl_flag=args.kl_flag)
+            output, visual_map_list, a_fea_list = model(imgs, audio_feature) # [bs*5, 1, 224, 224]
+            loss, loss_dict = IouSemanticAwareLoss(output, mask.unsqueeze(1).unsqueeze(1), \
+                                                a_fea_list, visual_map_list, \
+                                                lambda_1=args.lambda_1, \
+                                                count_stages=args.sa_loss_stages, \
+                                                sa_loss_flag=args.sa_loss_flag, \
+                                                mask_pooling_type=args.mask_pooling_type)
+
 
             avg_meter_total_loss.add({'total_loss': loss.item()})
             avg_meter_iou_loss.add({'iou_loss': loss_dict['iou_loss']})
@@ -235,23 +226,25 @@ if __name__ == "__main__":
             optimizer.step()
 
             global_step += 1
-            if (global_step-1) % 20 == 0:
-                train_log = 'Iter:%5d/%5d, Total_Loss:%.4f, iou_loss:%.4f, sa_loss:%.4f, lr: %.4f'%(
-                            global_step-1, max_step, avg_meter_total_loss.pop('total_loss'), avg_meter_iou_loss.pop('iou_loss'), avg_meter_sa_loss.pop('sa_loss'), optimizer.param_groups[0]['lr'])
+
+            if (global_step-1) % 50 == 0:
+                train_log = 'Iter:%5d/%5d, Total_Loss:%.4f, iou_loss:%.4f, sa_loss:%.4f, lambda_1:%.4f, lr: %.4f'%(
+                            global_step-1, max_step, avg_meter_total_loss.pop('total_loss'), avg_meter_iou_loss.pop('iou_loss'), avg_meter_sa_loss.pop('sa_loss'), args.lambda_1, optimizer.param_groups[0]['lr'])
                 # train_log = ['Iter:%5d/%5d' % (global_step - 1, max_step),
-                #         'Total_Loss:%.4f' % (avg_meter_total_loss.pop('total_loss')),
-                #         'iou_loss:%.4f' % (avg_meter_L1.pop('iou_loss')),
-                #         'sa_loss:%.4f' % (avg_meter_L4.pop('sa_loss')),
+                #         'Total_Loss:%.4f' % (avg_meter_loss.pop('total_loss')),
+                #         'iou_loss:%.4f' % (avg_meter_iou_loss.pop('iou_loss')),
+                #         'sa_loss:%.4f' % (avg_meter_sa_loss.pop('sa_loss')),
                 #         'lambda_1:%.4f' % (args.lambda_1),
                 #         'lr: %.4f' % (optimizer.param_groups[0]['lr'])]
                 # print(train_log, flush=True)
                 logger.info(train_log)
 
+
         # Validation:
         model.eval()
         with torch.no_grad():
             for n_iter, batch_data in enumerate(val_dataloader):
-                imgs, audio, mask, _ = batch_data # [bs, 5, 3, 224, 224], [bs, 5, 1, 96, 64], [bs, 5, 1, 224, 224]
+                imgs, audio, mask, _, _ = batch_data # [bs, 5, 3, 224, 224], [bs, 5, 1, 96, 64], [bs, 5, 1, 224, 224]
 
                 imgs = imgs.cuda()
                 audio = audio.cuda()
@@ -264,6 +257,7 @@ if __name__ == "__main__":
                     audio_feature = audio_backbone(audio)
 
                 output, _, _ = model(imgs, audio_feature) # [bs*5, 1, 224, 224]
+
 
                 miou = mask_iou(output.squeeze(1), mask)
                 avg_meter_miou.add({'miou': miou})
@@ -284,6 +278,8 @@ if __name__ == "__main__":
 
         model.train()
     logger.info('best val Miou {} at peoch: {}'.format(max_miou, best_epoch))
+
+
 
 
 

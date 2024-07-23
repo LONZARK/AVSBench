@@ -8,7 +8,7 @@ import argparse
 import logging
 
 from config import cfg
-from dataloader import MS3Dataset
+from dataloader import S4Dataset
 from torchvggish import vggish
 
 from utils import pyutils
@@ -26,10 +26,9 @@ class audio_extractor(torch.nn.Module):
         audio_fea = self.audio_backbone(audio)
         return audio_fea
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--session_name", default="MS3", type=str, help="the MS3 setting")
+    parser.add_argument("--session_name", default="S4", type=str, help="the S4 setting")
     parser.add_argument("--visual_backbone", default="resnet", type=str, help="use resnet50 or pvt-v2 as the visual backbone")
 
     parser.add_argument("--test_batch_size", default=1, type=int)
@@ -38,7 +37,7 @@ if __name__ == "__main__":
     parser.add_argument("--num_workers", default=8, type=int)
     parser.add_argument("--wt_dec", default=5e-4, type=float)
 
-    parser.add_argument("--tpavi_stages", default=[], nargs='+', type=int, help='add non-local block in which stages: [0, 1, 2, 3')
+    parser.add_argument("--tpavi_stages", default=[], nargs='+', type=int, help='add tpavi block in which stages: [0, 1, 2, 3')
     parser.add_argument("--tpavi_vv_flag", action='store_true', default=False, help='visual-visual self-attention')
     parser.add_argument("--tpavi_va_flag", action='store_true', default=False, help='visual-audio cross-attention')
 
@@ -57,6 +56,7 @@ if __name__ == "__main__":
     else:
         raise NotImplementedError("only support the resnet50 and pvt-v2")
 
+
     # Log directory
     if not os.path.exists(args.log_dir):
         os.makedirs(args.log_dir)
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     script_path = os.path.join(log_dir, 'scripts')
     if not os.path.exists(script_path):
         os.makedirs(script_path, exist_ok=True)
-    
+
     scripts_to_save = ['train.sh', 'train.py', 'test.sh', 'test.py', 'config.py', 'dataloader.py', './model/ResNet_AVSModel.py', './model/PVT_AVSModel.py', 'loss.py']
     for script in scripts_to_save:
         dst_path = os.path.join(script_path, script)
@@ -98,7 +98,7 @@ if __name__ == "__main__":
                                         tpavi_va_flag=args.tpavi_va_flag)
     model.load_state_dict(torch.load(args.weights))
     model = torch.nn.DataParallel(model).cuda()
-    logger.info('Load trained model %s'%args.weights)
+    logger.info('=> Load trained model %s'%args.weights)
 
     # audio backbone
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
     # Test data
     split = 'test'
-    test_dataset = MS3Dataset(split)
+    test_dataset = S4Dataset(split)
     test_dataloader = torch.utils.data.DataLoader(test_dataset,
                                                         batch_size=args.test_batch_size,
                                                         shuffle=False,
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     model.eval()
     with torch.no_grad():
         for n_iter, batch_data in enumerate(test_dataloader):
-            imgs, audio, mask, video_name_list = batch_data # [bs, 5, 3, 224, 224], [bs, 5, 1, 96, 64], [bs, 1, 1, 224, 224]
+            imgs, audio, mask, category_list, video_name_list = batch_data # [bs, 5, 3, 224, 224], [bs, 5, 1, 96, 64], [bs, 1, 1, 224, 224]
 
             imgs = imgs.cuda()
             audio = audio.cuda()
@@ -134,10 +134,10 @@ if __name__ == "__main__":
             with torch.no_grad():
                 audio_feature = audio_backbone(audio)
 
-            output, _, _,= model(imgs, audio_feature) # [5, 1, 224, 224] = [bs=1 * T=5, 1, 224, 224]
+            output, _, _ = model(imgs, audio_feature) # [5, 1, 224, 224] = [bs=1 * T=5, 1, 224, 224]
             if args.save_pred_mask:
                 mask_save_path = os.path.join(log_dir, 'pred_masks')
-                save_mask(output.squeeze(1), mask_save_path, video_name_list)
+                save_mask(output.squeeze(1), mask_save_path, category_list, video_name_list)
 
             miou = mask_iou(output.squeeze(1), mask)
             avg_meter_miou.add({'miou': miou})

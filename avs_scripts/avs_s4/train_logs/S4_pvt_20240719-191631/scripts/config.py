@@ -6,53 +6,49 @@ import pdb
 default config
 """
 cfg = edict()
-cfg.BATCH_SIZE = 4 # default 16
-cfg.LAMBDA_1 = 5 # default: 5
-cfg.MASK_NUM = 1 # 5 for fully supervised, 1 for weakly supervised
+cfg.BATCH_SIZE = 4
+cfg.LAMBDA_1 = 50
 
-###############################
+##############################
 # TRAIN
 cfg.TRAIN = edict()
-
+# TRAIN.SCHEDULER
 cfg.TRAIN.FREEZE_AUDIO_EXTRACTOR = True
 cfg.TRAIN.PRETRAINED_VGGISH_MODEL_PATH = "../../pretrained_backbones/vggish-10086976.pth"
 cfg.TRAIN.PREPROCESS_AUDIO_TO_LOG_MEL = False
 cfg.TRAIN.POSTPROCESS_LOG_MEL_WITH_PCA = False
 cfg.TRAIN.PRETRAINED_PCA_PARAMS_PATH = "../../pretrained_backbones/vggish_pca_params-970ea276.pth"
-cfg.TRAIN.FREEZE_VISUAL_EXTRACTOR = True
+cfg.TRAIN.FREEZE_VISUAL_EXTRACTOR = False
 cfg.TRAIN.PRETRAINED_RESNET50_PATH = "../../pretrained_backbones/resnet50-19c8e357.pth"
 cfg.TRAIN.PRETRAINED_PVTV2_PATH = "../../pretrained_backbones/pvt_v2_b5.pth"
-
-cfg.TRAIN.FINE_TUNE_SSSS = False
-cfg.TRAIN.PRETRAINED_S4_aAVS_WO_TPAVI_PATH = "../avs_s4/train_logs/checkpoints/checkpoint_xxx.pth.tar"
-cfg.TRAIN.PRETRAINED_S4_AVS_WITH_TPAVI_PATH = "../avs_s4/train_logs/checkpoints/checkpoint_xxx.pth.tar"
 
 ###############################
 # DATA
 cfg.DATA = edict()
-cfg.DATA.ANNO_CSV = "/mnt/data1/jiali/avsbench_data/Multi-sources/ms3_meta_data.csv"
-cfg.DATA.DIR_IMG = "/mnt/data1/jiali/avsbench_data/Multi-sources/ms3_data/visual_frames"
-cfg.DATA.DIR_AUDIO_LOG_MEL = "/mnt/data1/jiali/avsbench_data/Multi-sources/ms3_data/audio_log_mel"
-cfg.DATA.DIR_MASK = "/mnt/data1/jiali/avsbench_data/Multi-sources/ms3_data/gt_masks"
+cfg.DATA.ANNO_CSV = "/mnt/data1/jiali/avsbench_data/Single-source/s4_meta_data.csv"
+cfg.DATA.DIR_IMG = "/mnt/data1/jiali/avsbench_data/Single-source/s4_data/visual_frames"
+cfg.DATA.DIR_AUDIO_LOG_MEL = "/mnt/data1/jiali/avsbench_data/Single-source/s4_data/audio_log_mel"
+cfg.DATA.DIR_MASK = "/mnt/data1/jiali/avsbench_data/Single-source/s4_data/gt_masks"
 cfg.DATA.IMG_SIZE = (224, 224)
 
 # avsbench - s4
 cfg.DATA_avsbench = edict()
-cfg.DATA_avsbench.ANNO_CSV = "/mnt/data1/jiali/avsbench_data/Multi-sources/ms3_meta_data.csv"
-cfg.DATA_avsbench.DIR_IMG = "/mnt/data1/jiali/avsbench_data/Multi-sources/ms3_data/visual_frames"
-cfg.DATA_avsbench.DIR_AUDIO_LOG_MEL = "/mnt/data1/jiali/avsbench_data/Multi-sources/ms3_data/audio_log_mel"
-cfg.DATA_avsbench.DIR_MASK = "/mnt/data1/jiali/avsbench_data/Multi-sources/ms3_data/gt_masks"
+cfg.DATA_avsbench.ANNO_CSV = "/mnt/data1/jiali/avsbench_data/Single-source/s4_meta_data.csv"
+cfg.DATA_avsbench.DIR_IMG = "/mnt/data1/jiali/avsbench_data/Single-source/s4_data/visual_frames"
+cfg.DATA_avsbench.DIR_AUDIO_LOG_MEL = "/mnt/data1/jiali/avsbench_data/Single-source/s4_data/audio_log_mel"
+cfg.DATA_avsbench.DIR_MASK = "/mnt/data1/jiali/avsbench_data/Single-source/s4_data/gt_masks"
 cfg.DATA_avsbench.IMG_SIZE = (224, 224)
 
 # synthesis_avsbench_random4 - s4
 cfg.DATA_synthesis_avsbench_random4 = edict()
-cfg.DATA_synthesis_avsbench_random4.ANNO_CSV = "/mnt/data1/jiali/avsbench_synthesis_visual_random4/Multi-sources/ms3_meta_data.csv"  # 
-cfg.DATA_synthesis_avsbench_random4.DIR_IMG = "/mnt/data1/jiali/avsbench_synthesis_visual_random4/Multi-sources/ms3_data/visual_frames"
-cfg.DATA_synthesis_avsbench_random4.DIR_AUDIO_LOG_MEL = "/mnt/data1/jiali/avsbench_synthesis_visual_random4/Multi-sources/ms3_data/audio_log_mel"
-cfg.DATA_synthesis_avsbench_random4.DIR_MASK = "/mnt/data1/jiali/avsbench_synthesis_visual_random4/Multi-sources/ms3_data/gt_masks"
+cfg.DATA_synthesis_avsbench_random4.ANNO_CSV = "/mnt/data1/jiali/avsbench_synthesis_visual_random4/Single-source/s4_meta_data.csv"  # 
+cfg.DATA_synthesis_avsbench_random4.DIR_IMG = "/mnt/data1/jiali/avsbench_synthesis_visual_random4/Single-source/s4_data/visual_frames"
+cfg.DATA_synthesis_avsbench_random4.DIR_AUDIO_LOG_MEL = "/mnt/data1/jiali/avsbench_synthesis_visual_random4/Single-source/s4_data/audio_log_mel"
+cfg.DATA_synthesis_avsbench_random4.DIR_MASK = "/mnt/data1/jiali/avsbench_synthesis_visual_random4/Single-source/s4_data/gt_masks"
 cfg.DATA_synthesis_avsbench_random4.IMG_SIZE = (224, 224)
-
 ###############################
+
+
 
 
 # def _edict2dict(dest_dict, src_edict):
