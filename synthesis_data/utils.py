@@ -259,7 +259,6 @@ def save_stitched_images_ms3(stitched_image, stitched_label, input_video_path, t
 def stitch_frames(base_dir, input_video_path, folder, save_floder_name, num_with_audio_and_mask=random.randint(1, 4)):
     
     input_image_category = get_category_from_path(input_video_path)
-    print('input_image_category:', input_image_category)
     
     selected_categories, other_categories = select_categories(base_dir, input_image_category)
     selected_videos = select_videos(base_dir, input_video_path, other_categories)

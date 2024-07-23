@@ -80,7 +80,7 @@ if __name__ == "__main__":
         os.makedirs(args.log_dir, exist_ok=True)
     # Logs
     prefix = args.session_name
-    log_dir = os.path.join(args.log_dir, '{}'.format(time.strftime(prefix + '_%Y%m%d-%H%M%S')))
+    log_dir = os.path.join(args.log_dir, 'original_{}'.format(time.strftime(prefix + '_%Y%m%d-%H%M%S')))
     args.log_dir = log_dir
 
     # Save scripts
@@ -264,7 +264,7 @@ if __name__ == "__main__":
 
             miou = (avg_meter_miou.pop('miou'))
             if miou > max_miou:
-                model_save_path = os.path.join(checkpoint_dir, '%s_best.pth'%(args.session_name))
+                model_save_path = os.path.join(checkpoint_dir, '%s_best_original.pth'%(args.session_name))
                 torch.save(model.module.state_dict(), model_save_path)
                 best_epoch = epoch
                 logger.info('save best model to %s'%model_save_path)
@@ -277,15 +277,7 @@ if __name__ == "__main__":
             logger.info(val_log)
 
         model.train()
+
+    model_save_path = os.path.join(checkpoint_dir, '%s_final_original.pth'%(args.session_name))
+    torch.save(model.module.state_dict(), model_save_path)
     logger.info('best val Miou {} at peoch: {}'.format(max_miou, best_epoch))
-
-
-
-
-
-
-
-
-
-
-
