@@ -222,7 +222,7 @@ def remove_mp4_from_paths(paths):
         filename = path_parts[-1]
         
         # Remove the .mp4 from the filename
-        new_filename = filename.replace('.mp4', '')
+        new_filename = filename.replace('.mp4', '_')
 
         # Reconstruct the full path
         path_parts[-1] = new_filename
@@ -249,11 +249,12 @@ def save_stitched_images_ms3(stitched_image, stitched_label, input_video_path, t
     stitched_image.save(os.path.join(syn_video_savedir, temp_frame))
 
     syn_gt_savedir = syn_video_savedir.replace('/visual_frames/', f'/gt_masks/{folder}/')
-    gt_mask_path = os.path.join(syn_gt_savedir, temp_frame)
+    gt_frame_name = temp_frame.replace('.mp4_','_')
+    gt_mask_path = os.path.join(syn_gt_savedir, gt_frame_name)
+    print('111gt_mask_path', gt_mask_path)
+    gt_mask_path = remove_mp4_from_paths([gt_mask_path])[0]
+    print('222gt_mask_path', gt_mask_path)
 
-    if folder == 'train':
-        gt_mask_path = gt_mask_path.rsplit('_', 1)[0] + '_1.png'  
-        gt_mask_path = remove_mp4_from_paths([gt_mask_path])[0]
     stitched_label.save(gt_mask_path)
 
 def stitch_frames(base_dir, input_video_path, folder, save_floder_name, num_with_audio_and_mask=random.randint(1, 4)):
@@ -392,7 +393,8 @@ def extract_log_mel_features(wav_path, n_mels=64, n_fft=1024, hop_length=512, nu
     for segment in y_segments:
         mel_spectrogram = librosa.feature.melspectrogram(y=segment, sr=sr, n_mels=n_mels, n_fft=n_fft, hop_length=hop_length)
         log_mel = librosa.power_to_db(mel_spectrogram)
-        log_mel = (log_mel - log_mel.mean()) / log_mel.std()
+        epsilon = 1e-10
+        log_mel = (log_mel - log_mel.mean()) / (log_mel.std() + epsilon)
         
         # 调整时间帧数
         if log_mel.shape[1] < num_frames:
