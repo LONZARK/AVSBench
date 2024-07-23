@@ -55,7 +55,6 @@ class MS3Dataset(Dataset):
         video_name = df_one_video[0]
         img_base_path =  os.path.join(cfg.DATA.DIR_IMG, video_name)
         audio_lm_path = os.path.join(cfg.DATA.DIR_AUDIO_LOG_MEL, self.split, video_name + '.pkl')
-        # audio_lm_path = '/home/jiali/AVSBench/synthesis_data/slience.pkl'
         mask_base_path = os.path.join(cfg.DATA.DIR_MASK, self.split, video_name)
         audio_log_mel = load_audio_lm(audio_lm_path)
         # audio_lm_tensor = torch.from_numpy(audio_log_mel)
@@ -128,9 +127,9 @@ class MS3Dataset_mix(Dataset):
         else:
             base_path = cfg.DATA_synthesis_avsbench_random4
 
-        img_base_path =  os.path.join(base_path.DIR_IMG, video_name)
-        audio_lm_path = os.path.join(base_path.DIR_AUDIO_LOG_MEL, self.split, video_name + '.pkl')
-        mask_base_path = os.path.join(base_path.DIR_MASK, self.split, video_name)
+        img_base_path =  os.path.join(cfg.DATA.DIR_IMG, video_name)
+        audio_lm_path = os.path.join(cfg.DATA.DIR_AUDIO_LOG_MEL, self.split, video_name + '.pkl')
+        mask_base_path = os.path.join(cfg.DATA.DIR_MASK, self.split, video_name)
         
         audio_log_mel = load_audio_lm(audio_lm_path)
         imgs, masks = [], []

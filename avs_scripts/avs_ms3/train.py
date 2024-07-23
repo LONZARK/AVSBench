@@ -59,6 +59,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--weights", type=str, default='', help='path of trained model')
     parser.add_argument('--log_dir', default='./train_logs', type=str)
+    parser.add_argument('--easy_ratio', default=1.0, type=float)
 
     args = parser.parse_args()
 
@@ -84,7 +85,7 @@ if __name__ == "__main__":
         os.makedirs(args.log_dir, exist_ok=True)
     # Logs
     prefix = args.session_name
-    log_dir = os.path.join(args.log_dir, 'original_{}'.format(time.strftime(prefix + '_%Y%m%d-%H%M%S')))
+    log_dir = os.path.join(args.log_dir, '{}'.format(time.strftime(prefix + '_%Y%m%d-%H%M%S')))
     args.log_dir = log_dir
 
     # Save scripts
@@ -162,7 +163,7 @@ if __name__ == "__main__":
     # The following is curriculum learning, based on the setting on paper[Cooperative Learning of Audio and Video Models from 
     # Self-Supervised Synchronization], we can set two learning stage: first half epochs with easy samples only, and second 
     # learning stage with 75% easy + 25% hard mixed datas applied later.
-    train_dataset = MS3Dataset_mix('train', easy_ratio=1.0)
+    train_dataset = MS3Dataset_mix('train', easy_ratio=1)
     train_dataloader = torch.utils.data.DataLoader(train_dataset,
                                                         batch_size=args.train_batch_size,
                                                         shuffle=True,
@@ -202,9 +203,9 @@ if __name__ == "__main__":
         # train_dataset.update_dataset()
 
         if epoch == trainsition_epoch:
-            train_dataset.easy_ratio = 0.75
+            train_dataset.easy_ratio = args.easy_ratio
             train_dataset.update_dataset()
-            print(f'Transitioning to mixed difficulty training at epoch {epoch + 1}')
+            logger.info('Transitioning to mixed difficulty training at epoch {}, easy_ration = {}'.format(epoch, args.easy_ratio))
 
         for n_iter, batch_data in enumerate(train_dataloader):
             imgs, audio, mask, _ = batch_data # [bs, 5, 3, 224, 224], [bs, 5, 1, 96, 64], [bs, 5 or 1, 1, 224, 224]
@@ -216,6 +217,7 @@ if __name__ == "__main__":
             imgs = imgs.view(B*frame, C, H, W)
             mask_num = 5
             mask = mask.view(B*mask_num, 1, H, W)
+
             audio = audio.view(-1, audio.shape[2], audio.shape[3], audio.shape[4]) # [B*T, 1, 96, 64]
             with torch.no_grad():
                 audio_feature = audio_backbone(audio) # [B*T, 128]
@@ -270,7 +272,7 @@ if __name__ == "__main__":
 
             miou = (avg_meter_miou.pop('miou'))
             if miou > max_miou:
-                model_save_path = os.path.join(checkpoint_dir, '%s_best_original.pth'%(args.session_name))
+                model_save_path = os.path.join(checkpoint_dir, '%s_best.pth'%(args.session_name))
                 torch.save(model.module.state_dict(), model_save_path)
                 best_epoch = epoch
                 logger.info('save best model to %s'%model_save_path)
@@ -283,6 +285,6 @@ if __name__ == "__main__":
             logger.info(val_log)
 
         model.train()
-    model_save_path = os.path.join(checkpoint_dir, '%s_final_original.pth'%(args.session_name))
+    model_save_path = os.path.join(checkpoint_dir, '%s_final.pth'%(args.session_name))
     torch.save(model.module.state_dict(), model_save_path)
     logger.info('best val Miou {} at peoch: {}'.format(max_miou, best_epoch))

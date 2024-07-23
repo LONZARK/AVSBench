@@ -351,27 +351,62 @@ def mix_audio_files(audio_file_paths, output_path):
     mixed_audio.export(output_path, format="wav")
 
 
-def extract_log_mel_features(wav_file, n_mels=128, n_fft=2048, hop_length=512):
-    """
-    Extract log-mel features from a WAV file.
+# def extract_log_mel_features(wav_file, n_mels=128, n_fft=2048, hop_length=512):
+#     """
+#     Extract log-mel features from a WAV file.
     
-    Args:
-    wav_file (str): Path to the WAV file.
-    n_mels (int): Number of mel bands to generate.
-    n_fft (int): Length of the FFT window.
-    hop_length (int): Number of samples between successive frames.
+#     Args:
+#     wav_file (str): Path to the WAV file.
+#     n_mels (int): Number of mel bands to generate.
+#     n_fft (int): Length of the FFT window.
+#     hop_length (int): Number of samples between successive frames.
     
-    Returns:
-    numpy.ndarray: Log-mel spectrogram.
-    """
-    # Load the audio file
-    y, sr = librosa.load(wav_file)
+#     Returns:
+#     numpy.ndarray: Log-mel spectrogram.
+#     """
+#     # Load the audio file
+#     y, sr = librosa.load(wav_file)
     
-    # Compute mel spectrogram
-    mel_spectrogram = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels, 
-                                                     n_fft=n_fft, hop_length=hop_length)
+#     # Compute mel spectrogram
+#     mel_spectrogram = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels, 
+#                                                      n_fft=n_fft, hop_length=hop_length)
     
-    # Convert to log scale
-    log_mel_spectrogram = librosa.power_to_db(mel_spectrogram, ref=np.max)
+#     # Convert to log scale
+#     log_mel_spectrogram = librosa.power_to_db(mel_spectrogram, ref=np.max)
     
-    return log_mel_spectrogram
+#     return log_mel_spectrogram
+import librosa
+import numpy as np
+import torch
+def extract_log_mel_features(wav_path, n_mels=64, n_fft=1024, hop_length=512, num_frames=96, duration=5):
+    y, sr = librosa.load(wav_path, duration=duration)
+    
+    # 确保音频长度为5秒
+    if len(y) < sr * duration:
+        y = np.pad(y, (0, sr * duration - len(y)))
+    
+    # 分割音频为5个1秒的片段
+    y_segments = np.array_split(y, 5)
+    
+    log_mel_segments = []
+    for segment in y_segments:
+        mel_spectrogram = librosa.feature.melspectrogram(y=segment, sr=sr, n_mels=n_mels, n_fft=n_fft, hop_length=hop_length)
+        log_mel = librosa.power_to_db(mel_spectrogram)
+        log_mel = (log_mel - log_mel.mean()) / log_mel.std()
+        
+        # 调整时间帧数
+        if log_mel.shape[1] < num_frames:
+            pad_width = num_frames - log_mel.shape[1]
+            log_mel = np.pad(log_mel, ((0, 0), (0, pad_width)), mode='constant')
+        elif log_mel.shape[1] > num_frames:
+            log_mel = log_mel[:, :num_frames]
+        
+        log_mel_segments.append(log_mel)
+    
+    # 堆叠5个片段
+    log_mel_stack = np.stack(log_mel_segments)
+    
+    # 转换为PyTorch张量并调整形状为 [5, 1, 96, 64]
+    log_mel_tensor = torch.from_numpy(log_mel_stack).float().permute(0, 2, 1).unsqueeze(1)
+    
+    return log_mel_tensor
