@@ -111,15 +111,30 @@ class MS3Dataset_mix(Dataset):
             transforms.ToTensor(),
         ])
 
+    # def update_dataset(self):
+    #     '''
+    #     Keep the total amount of data unchanged, but only replaces part of the original data with synthetic data.
+    #     '''
+    #     num_original_samples = int(len(self.df_original) * self.easy_ratio)
+    #     num_synthesis_samples = len(self.df_original) -  num_original_samples
+
+    #     combined_original = self.df_original.sample(n = num_original_samples)
+    #     combined_synthesis = self.df_synthesis.sample(n = num_synthesis_samples)
+
+    #     # concatenate dataframes, combine samples from both dataset, 
+    #     self.df_split = pd.concat([combined_original, combined_synthesis]).reset_index(drop=True)
+
     def update_dataset(self):
-        num_original_samples = int(len(self.df_original) * self.easy_ratio)
-        num_synthesis_samples = len(self.df_original) -  num_original_samples
+        '''
+        Increasing the amount of training data: Keep all original data, and add synthetic data in addition: 
+        '''
+        num_total = len(self.df_original) / self.easy_ratio
+        num_synthesis_samples = int(num_total * (1 - self.easy_ratio))
 
-        combined_original = self.df_original.sample(n = num_original_samples)
-        combined_synthesis = self.df_synthesis.sample(n = num_synthesis_samples)
-
-        # concatenate dataframes, combine samples from both dataset, 
-        self.df_split = pd.concat([combined_original, combined_synthesis]).reset_index(drop=True)
+        combined_synthesis = self.df_synthesis.sample(n=num_synthesis_samples)
+        self.df_split = pd.concat([self.df_original, combined_synthesis]).reset_index(drop=True)
+        # Add a new column to indicate the dataset type
+        self.df_split['dataset_type'] = ['original'] * len(self.df_original) + ['synthesis'] * num_synthesis_samples
 
 
     def __getitem__(self, index):
@@ -127,7 +142,10 @@ class MS3Dataset_mix(Dataset):
         # Determine from which dataset to load
         df_one_video = self.df_split.iloc[index]
 
-        dataset_type = 'original' if index < len(self.df_original) * self.easy_ratio else 'synthesis'
+        # dataset_type = 'original' if index < len(self.df_original) * self.easy_ratio else 'synthesis'
+        # Use the new 'dataset_type' column to determine the dataset
+        dataset_type = df_one_video['dataset_type']
+
         video_name = df_one_video[0]
         if dataset_type == 'original':
             base_path = cfg.DATA_avsbench

@@ -247,8 +247,6 @@ class S4Dataset_mix(Dataset):
 
     def __len__(self):
         return len(self.df_split)
-    
-
 class S4Dataset_avsbench(Dataset):
     """Dataset for single sound source segmentation"""
     def __init__(self, split='train'):
@@ -371,37 +369,23 @@ class S4Dataset_mix(Dataset):
             transforms.ToTensor(),
         ])
 
-    # def update_dataset(self):
-    #     '''
-    #     Keep the total amount of data unchanged, but only replaces part of the original data with synthetic data.
-    #     '''
-    #     num_original_samples = int(len(self.df_original) * self.easy_ratio)
-    #     num_synthesis_samples = len(self.df_original) -  num_original_samples
-
-    #     combined_original = self.df_original.sample(n = num_original_samples)
-    #     combined_synthesis = self.df_synthesis.sample(n = num_synthesis_samples)
-
-    #     # concatenate dataframes, combine samples from both dataset, 
-    #     self.df_split = pd.concat([combined_original, combined_synthesis]).reset_index(drop=True)
-
-
     def update_dataset(self):
-        '''
-        Increasing the amount of training data: Keep all original data, and add synthetic data in addition: 
-        '''
-        num_synthesis_samples = int(len(self.df_original) * (1 - self.easy_ratio))
-        combined_synthesis = self.df_synthesis.sample(n=num_synthesis_samples)
-        self.df_split = pd.concat([self.df_original, combined_synthesis]).reset_index(drop=True)
-        self.df_split['dataset_type'] = ['original'] * len(self.df_original) + ['synthesis'] * num_synthesis_samples
+        num_original_samples = int(len(self.df_original) * self.easy_ratio)
+        num_synthesis_samples = len(self.df_original) -  num_original_samples
+
+        combined_original = self.df_original.sample(n = num_original_samples)
+        combined_synthesis = self.df_synthesis.sample(n = num_synthesis_samples)
+
+        # concatenate dataframes, combine samples from both dataset, 
+        self.df_split = pd.concat([combined_original, combined_synthesis]).reset_index(drop=True)
+
 
     def __getitem__(self, index):
         
         # Determine from which dataset to load
         df_one_video = self.df_split.iloc[index]
 
-        # dataset_type = 'original' if index < len(self.df_original) * self.easy_ratio else 'synthesis'
-        dataset_type = df_one_video['dataset_type']
-
+        dataset_type = 'original' if index < len(self.df_original) * self.easy_ratio else 'synthesis'
         video_name, category = df_one_video[0], df_one_video[2]
         if dataset_type == 'original':
             base_path = cfg.DATA_avsbench
