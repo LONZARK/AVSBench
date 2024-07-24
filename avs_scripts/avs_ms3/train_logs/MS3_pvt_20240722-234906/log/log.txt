@@ -1,0 +1,153 @@
+2024-07-22 23:49:06,917 __main__ INFO ==> Config: {'BATCH_SIZE': 4, 'LAMBDA_1': 5, 'MASK_NUM': 1, 'TRAIN': {'FREEZE_AUDIO_EXTRACTOR': True, 'PRETRAINED_VGGISH_MODEL_PATH': '../../pretrained_backbones/vggish-10086976.pth', 'PREPROCESS_AUDIO_TO_LOG_MEL': False, 'POSTPROCESS_LOG_MEL_WITH_PCA': False, 'PRETRAINED_PCA_PARAMS_PATH': '../../pretrained_backbones/vggish_pca_params-970ea276.pth', 'FREEZE_VISUAL_EXTRACTOR': True, 'PRETRAINED_RESNET50_PATH': '../../pretrained_backbones/resnet50-19c8e357.pth', 'PRETRAINED_PVTV2_PATH': '../../pretrained_backbones/pvt_v2_b5.pth', 'FINE_TUNE_SSSS': False, 'PRETRAINED_S4_aAVS_WO_TPAVI_PATH': '../avs_s4/train_logs/checkpoints/checkpoint_xxx.pth.tar', 'PRETRAINED_S4_AVS_WITH_TPAVI_PATH': '../avs_s4/train_logs/checkpoints/checkpoint_xxx.pth.tar'}, 'DATA': {'ANNO_CSV': '/mnt/data1/jiali/avsbench_data/Multi-sources/ms3_meta_data.csv', 'DIR_IMG': '/mnt/data1/jiali/avsbench_data/Multi-sources/ms3_data/visual_frames', 'DIR_AUDIO_LOG_MEL': '/mnt/data1/jiali/avsbench_data/Multi-sources/ms3_data/audio_log_mel', 'DIR_MASK': '/mnt/data1/jiali/avsbench_data/Multi-sources/ms3_data/gt_masks', 'IMG_SIZE': (224, 224)}, 'DATA_avsbench': {'ANNO_CSV': '/mnt/data1/jiali/avsbench_data/Multi-sources/ms3_meta_data.csv', 'DIR_IMG': '/mnt/data1/jiali/avsbench_data/Multi-sources/ms3_data/visual_frames', 'DIR_AUDIO_LOG_MEL': '/mnt/data1/jiali/avsbench_data/Multi-sources/ms3_data/audio_log_mel', 'DIR_MASK': '/mnt/data1/jiali/avsbench_data/Multi-sources/ms3_data/gt_masks', 'IMG_SIZE': (224, 224)}, 'DATA_synthesis_avsbench_random4': {'ANNO_CSV': '/mnt/data1/jiali/avsbench_synthesis_visual_random4/Multi-sources/ms3_meta_data.csv', 'DIR_IMG': '/mnt/data1/jiali/avsbench_synthesis_visual_random4/Multi-sources/ms3_data/visual_frames', 'DIR_AUDIO_LOG_MEL': '/mnt/data1/jiali/avsbench_synthesis_visual_random4/Multi-sources/ms3_data/audio_log_mel', 'DIR_MASK': '/mnt/data1/jiali/avsbench_synthesis_visual_random4/Multi-sources/ms3_data/gt_masks', 'IMG_SIZE': (224, 224)}}
+2024-07-22 23:49:06,917 __main__ INFO ==> Arguments: Namespace(session_name='MS3_pvt', visual_backbone='pvt', train_batch_size=4, val_batch_size=1, max_epoches=30, lr=0.0001, num_workers=8, wt_dec=0.0005, masked_av_flag=True, lambda_1=0.5, masked_av_stages=[0, 1, 2, 3], threshold_flag=False, mask_pooling_type='avg', norm_fea_flag=False, closer_flag=False, euclidean_flag=False, kl_flag=True, load_s4_params=False, trained_s4_model_path='', tpavi_stages=[0, 1, 2, 3], tpavi_vv_flag=False, tpavi_va_flag=True, weights='', log_dir='./train_logs/MS3_pvt_20240722-234906', easy_ratio=0.5, checkpoint_dir='./train_logs/MS3_pvt_20240722-234906/checkpoints')
+2024-07-22 23:49:06,917 __main__ INFO ==> Experiment: MS3_pvt
+2024-07-22 23:49:11,020 __main__ INFO ==> Total params: 101.32M
+2024-07-22 23:49:14,095 __main__ INFO Iter:    0/ 2220, Total_Loss:0.9293, iou_loss:0.6967, sa_loss:0.4651, lr: 0.0001
+2024-07-22 23:49:26,301 __main__ INFO Iter:   20/ 2220, Total_Loss:0.5823, iou_loss:0.4352, sa_loss:0.2942, lr: 0.0001
+2024-07-22 23:49:38,707 __main__ INFO Iter:   40/ 2220, Total_Loss:0.4444, iou_loss:0.3255, sa_loss:0.2378, lr: 0.0001
+2024-07-22 23:49:51,444 __main__ INFO Iter:   60/ 2220, Total_Loss:0.3993, iou_loss:0.2985, sa_loss:0.2016, lr: 0.0001
+2024-07-22 23:50:04,271 __main__ INFO save best model to ./train_logs/MS3_pvt_20240722-234906/checkpoints/MS3_pvt_best.pth
+2024-07-22 23:50:04,271 __main__ INFO Epoch: 0, Miou: 0.3717305660247803, maxMiou: 0.3717305660247803
+2024-07-22 23:50:09,095 __main__ INFO Iter:   80/ 2220, Total_Loss:0.4095, iou_loss:0.3120, sa_loss:0.1950, lr: 0.0001
+2024-07-22 23:50:21,700 __main__ INFO Iter:  100/ 2220, Total_Loss:0.3317, iou_loss:0.2382, sa_loss:0.1870, lr: 0.0001
+2024-07-22 23:50:34,468 __main__ INFO Iter:  120/ 2220, Total_Loss:0.3028, iou_loss:0.2213, sa_loss:0.1629, lr: 0.0001
+2024-07-22 23:50:46,950 __main__ INFO Iter:  140/ 2220, Total_Loss:0.3290, iou_loss:0.2489, sa_loss:0.1601, lr: 0.0001
+2024-07-22 23:50:56,374 __main__ INFO save best model to ./train_logs/MS3_pvt_20240722-234906/checkpoints/MS3_pvt_best.pth
+2024-07-22 23:50:56,375 __main__ INFO Epoch: 1, Miou: 0.4415278434753418, maxMiou: 0.4415278434753418
+2024-07-22 23:51:04,898 __main__ INFO Iter:  160/ 2220, Total_Loss:0.2930, iou_loss:0.2236, sa_loss:0.1387, lr: 0.0001
+2024-07-22 23:51:18,020 __main__ INFO Iter:  180/ 2220, Total_Loss:0.2629, iou_loss:0.1881, sa_loss:0.1496, lr: 0.0001
+2024-07-22 23:51:30,427 __main__ INFO Iter:  200/ 2220, Total_Loss:0.2448, iou_loss:0.1757, sa_loss:0.1383, lr: 0.0001
+2024-07-22 23:51:42,831 __main__ INFO Iter:  220/ 2220, Total_Loss:0.2393, iou_loss:0.1684, sa_loss:0.1417, lr: 0.0001
+2024-07-22 23:51:48,367 __main__ INFO Epoch: 2, Miou: 0.3752222955226898, maxMiou: 0.4415278434753418
+2024-07-22 23:52:01,252 __main__ INFO Iter:  240/ 2220, Total_Loss:0.2126, iou_loss:0.1463, sa_loss:0.1327, lr: 0.0001
+2024-07-22 23:52:13,612 __main__ INFO Iter:  260/ 2220, Total_Loss:0.2322, iou_loss:0.1702, sa_loss:0.1240, lr: 0.0001
+2024-07-22 23:52:25,991 __main__ INFO Iter:  280/ 2220, Total_Loss:0.2098, iou_loss:0.1509, sa_loss:0.1178, lr: 0.0001
+2024-07-22 23:52:41,747 __main__ INFO save best model to ./train_logs/MS3_pvt_20240722-234906/checkpoints/MS3_pvt_best.pth
+2024-07-22 23:52:41,748 __main__ INFO Epoch: 3, Miou: 0.5067906975746155, maxMiou: 0.5067906975746155
+2024-07-22 23:52:45,714 __main__ INFO Iter:  300/ 2220, Total_Loss:0.1914, iou_loss:0.1371, sa_loss:0.1087, lr: 0.0001
+2024-07-22 23:52:58,101 __main__ INFO Iter:  320/ 2220, Total_Loss:0.1935, iou_loss:0.1362, sa_loss:0.1147, lr: 0.0001
+2024-07-22 23:53:10,647 __main__ INFO Iter:  340/ 2220, Total_Loss:0.1908, iou_loss:0.1397, sa_loss:0.1023, lr: 0.0001
+2024-07-22 23:53:23,280 __main__ INFO Iter:  360/ 2220, Total_Loss:0.1864, iou_loss:0.1307, sa_loss:0.1112, lr: 0.0001
+2024-07-22 23:53:33,969 __main__ INFO Epoch: 4, Miou: 0.5018854141235352, maxMiou: 0.5067906975746155
+2024-07-22 23:53:41,123 __main__ INFO Iter:  380/ 2220, Total_Loss:0.1551, iou_loss:0.1046, sa_loss:0.1011, lr: 0.0001
+2024-07-22 23:53:53,524 __main__ INFO Iter:  400/ 2220, Total_Loss:0.1587, iou_loss:0.1096, sa_loss:0.0983, lr: 0.0001
+2024-07-22 23:54:06,175 __main__ INFO Iter:  420/ 2220, Total_Loss:0.1528, iou_loss:0.1084, sa_loss:0.0889, lr: 0.0001
+2024-07-22 23:54:18,800 __main__ INFO Iter:  440/ 2220, Total_Loss:0.1408, iou_loss:0.0954, sa_loss:0.0907, lr: 0.0001
+2024-07-22 23:54:25,528 __main__ INFO save best model to ./train_logs/MS3_pvt_20240722-234906/checkpoints/MS3_pvt_best.pth
+2024-07-22 23:54:25,528 __main__ INFO Epoch: 5, Miou: 0.5316269397735596, maxMiou: 0.5316269397735596
+2024-07-22 23:54:36,570 __main__ INFO Iter:  460/ 2220, Total_Loss:0.1504, iou_loss:0.1011, sa_loss:0.0986, lr: 0.0001
+2024-07-22 23:54:49,171 __main__ INFO Iter:  480/ 2220, Total_Loss:0.1549, iou_loss:0.1093, sa_loss:0.0911, lr: 0.0001
+2024-07-22 23:55:02,199 __main__ INFO Iter:  500/ 2220, Total_Loss:0.1306, iou_loss:0.0898, sa_loss:0.0815, lr: 0.0001
+2024-07-22 23:55:17,511 __main__ INFO Epoch: 6, Miou: 0.46410462260246277, maxMiou: 0.5316269397735596
+2024-07-22 23:55:19,858 __main__ INFO Iter:  520/ 2220, Total_Loss:0.1258, iou_loss:0.0878, sa_loss:0.0759, lr: 0.0001
+2024-07-22 23:55:32,428 __main__ INFO Iter:  540/ 2220, Total_Loss:0.1172, iou_loss:0.0776, sa_loss:0.0791, lr: 0.0001
+2024-07-22 23:55:45,025 __main__ INFO Iter:  560/ 2220, Total_Loss:0.1310, iou_loss:0.0913, sa_loss:0.0794, lr: 0.0001
+2024-07-22 23:55:57,405 __main__ INFO Iter:  580/ 2220, Total_Loss:0.1252, iou_loss:0.0841, sa_loss:0.0821, lr: 0.0001
+2024-07-22 23:56:09,487 __main__ INFO save best model to ./train_logs/MS3_pvt_20240722-234906/checkpoints/MS3_pvt_best.pth
+2024-07-22 23:56:09,488 __main__ INFO Epoch: 7, Miou: 0.5584874153137207, maxMiou: 0.5584874153137207
+2024-07-22 23:56:15,612 __main__ INFO Iter:  600/ 2220, Total_Loss:0.1278, iou_loss:0.0910, sa_loss:0.0736, lr: 0.0001
+2024-07-22 23:56:28,332 __main__ INFO Iter:  620/ 2220, Total_Loss:0.1119, iou_loss:0.0742, sa_loss:0.0753, lr: 0.0001
+2024-07-22 23:56:40,736 __main__ INFO Iter:  640/ 2220, Total_Loss:0.1060, iou_loss:0.0699, sa_loss:0.0720, lr: 0.0001
+2024-07-22 23:56:53,156 __main__ INFO Iter:  660/ 2220, Total_Loss:0.1057, iou_loss:0.0704, sa_loss:0.0706, lr: 0.0001
+2024-07-22 23:57:02,132 __main__ INFO Epoch: 8, Miou: 0.4311714172363281, maxMiou: 0.5584874153137207
+2024-07-22 23:57:12,669 __main__ INFO Iter:  680/ 2220, Total_Loss:0.0996, iou_loss:0.0655, sa_loss:0.0682, lr: 0.0001
+2024-07-22 23:57:25,000 __main__ INFO Iter:  700/ 2220, Total_Loss:0.1114, iou_loss:0.0775, sa_loss:0.0678, lr: 0.0001
+2024-07-22 23:57:37,387 __main__ INFO Iter:  720/ 2220, Total_Loss:0.1013, iou_loss:0.0687, sa_loss:0.0651, lr: 0.0001
+2024-07-22 23:57:55,230 __main__ INFO Epoch: 9, Miou: 0.5281521081924438, maxMiou: 0.5584874153137207
+2024-07-22 23:57:56,636 __main__ INFO Iter:  740/ 2220, Total_Loss:0.1082, iou_loss:0.0741, sa_loss:0.0682, lr: 0.0001
+2024-07-22 23:58:08,982 __main__ INFO Iter:  760/ 2220, Total_Loss:0.0971, iou_loss:0.0657, sa_loss:0.0628, lr: 0.0001
+2024-07-22 23:58:21,353 __main__ INFO Iter:  780/ 2220, Total_Loss:0.0891, iou_loss:0.0583, sa_loss:0.0615, lr: 0.0001
+2024-07-22 23:58:34,117 __main__ INFO Iter:  800/ 2220, Total_Loss:0.1002, iou_loss:0.0678, sa_loss:0.0648, lr: 0.0001
+2024-07-22 23:58:46,539 __main__ INFO Epoch: 10, Miou: 0.5085625052452087, maxMiou: 0.5584874153137207
+2024-07-22 23:58:51,208 __main__ INFO Iter:  820/ 2220, Total_Loss:0.0890, iou_loss:0.0587, sa_loss:0.0607, lr: 0.0001
+2024-07-22 23:59:03,605 __main__ INFO Iter:  840/ 2220, Total_Loss:0.0998, iou_loss:0.0697, sa_loss:0.0603, lr: 0.0001
+2024-07-22 23:59:16,609 __main__ INFO Iter:  860/ 2220, Total_Loss:0.0790, iou_loss:0.0494, sa_loss:0.0593, lr: 0.0001
+2024-07-22 23:59:29,055 __main__ INFO Iter:  880/ 2220, Total_Loss:0.0939, iou_loss:0.0638, sa_loss:0.0602, lr: 0.0001
+2024-07-22 23:59:38,078 __main__ INFO Epoch: 11, Miou: 0.4871447682380676, maxMiou: 0.5584874153137207
+2024-07-22 23:59:46,661 __main__ INFO Iter:  900/ 2220, Total_Loss:0.0824, iou_loss:0.0537, sa_loss:0.0573, lr: 0.0001
+2024-07-22 23:59:59,436 __main__ INFO Iter:  920/ 2220, Total_Loss:0.0911, iou_loss:0.0615, sa_loss:0.0591, lr: 0.0001
+2024-07-23 00:00:11,932 __main__ INFO Iter:  940/ 2220, Total_Loss:0.0749, iou_loss:0.0476, sa_loss:0.0546, lr: 0.0001
+2024-07-23 00:00:24,343 __main__ INFO Iter:  960/ 2220, Total_Loss:0.0861, iou_loss:0.0603, sa_loss:0.0515, lr: 0.0001
+2024-07-23 00:00:30,429 __main__ INFO save best model to ./train_logs/MS3_pvt_20240722-234906/checkpoints/MS3_pvt_best.pth
+2024-07-23 00:00:30,430 __main__ INFO Epoch: 12, Miou: 0.5764448642730713, maxMiou: 0.5764448642730713
+2024-07-23 00:00:43,257 __main__ INFO Iter:  980/ 2220, Total_Loss:0.0734, iou_loss:0.0458, sa_loss:0.0553, lr: 0.0001
+2024-07-23 00:00:56,153 __main__ INFO Iter: 1000/ 2220, Total_Loss:0.0650, iou_loss:0.0370, sa_loss:0.0560, lr: 0.0001
+2024-07-23 00:01:08,549 __main__ INFO Iter: 1020/ 2220, Total_Loss:0.0638, iou_loss:0.0391, sa_loss:0.0494, lr: 0.0001
+2024-07-23 00:01:24,232 __main__ INFO Epoch: 13, Miou: 0.5570957064628601, maxMiou: 0.5764448642730713
+2024-07-23 00:01:28,186 __main__ INFO Iter: 1040/ 2220, Total_Loss:0.0662, iou_loss:0.0421, sa_loss:0.0483, lr: 0.0001
+2024-07-23 00:01:40,547 __main__ INFO Iter: 1060/ 2220, Total_Loss:0.0551, iou_loss:0.0294, sa_loss:0.0513, lr: 0.0001
+2024-07-23 00:01:52,932 __main__ INFO Iter: 1080/ 2220, Total_Loss:0.0600, iou_loss:0.0363, sa_loss:0.0475, lr: 0.0001
+2024-07-23 00:02:05,684 __main__ INFO Iter: 1100/ 2220, Total_Loss:0.0567, iou_loss:0.0322, sa_loss:0.0491, lr: 0.0001
+2024-07-23 00:02:16,061 __main__ INFO Epoch: 14, Miou: 0.5605658888816833, maxMiou: 0.5764448642730713
+2024-07-23 00:02:16,066 __main__ INFO Transitioning to mixed difficulty training at epoch 15, easy_ration = 0.5
+2024-07-23 00:02:23,239 __main__ INFO Iter: 1120/ 2220, Total_Loss:0.2522, iou_loss:0.2176, sa_loss:0.0693, lr: 0.0001
+2024-07-23 00:02:35,722 __main__ INFO Iter: 1140/ 2220, Total_Loss:0.2220, iou_loss:0.1946, sa_loss:0.0549, lr: 0.0001
+2024-07-23 00:02:48,382 __main__ INFO Iter: 1160/ 2220, Total_Loss:0.2683, iou_loss:0.2456, sa_loss:0.0454, lr: 0.0001
+2024-07-23 00:03:00,915 __main__ INFO Iter: 1180/ 2220, Total_Loss:0.2215, iou_loss:0.2024, sa_loss:0.0382, lr: 0.0001
+2024-07-23 00:03:07,003 __main__ INFO Epoch: 15, Miou: 0.5634428262710571, maxMiou: 0.5764448642730713
+2024-07-23 00:03:17,947 __main__ INFO Iter: 1200/ 2220, Total_Loss:0.2303, iou_loss:0.2147, sa_loss:0.0313, lr: 0.0001
+2024-07-23 00:03:30,468 __main__ INFO Iter: 1220/ 2220, Total_Loss:0.2328, iou_loss:0.2174, sa_loss:0.0307, lr: 0.0001
+2024-07-23 00:03:43,008 __main__ INFO Iter: 1240/ 2220, Total_Loss:0.2563, iou_loss:0.2431, sa_loss:0.0264, lr: 0.0001
+2024-07-23 00:03:58,199 __main__ INFO Epoch: 16, Miou: 0.535695493221283, maxMiou: 0.5764448642730713
+2024-07-23 00:04:00,576 __main__ INFO Iter: 1260/ 2220, Total_Loss:0.2122, iou_loss:0.1951, sa_loss:0.0342, lr: 0.0001
+2024-07-23 00:04:13,140 __main__ INFO Iter: 1280/ 2220, Total_Loss:0.1891, iou_loss:0.1743, sa_loss:0.0297, lr: 0.0001
+2024-07-23 00:04:25,931 __main__ INFO Iter: 1300/ 2220, Total_Loss:0.2364, iou_loss:0.2221, sa_loss:0.0286, lr: 0.0001
+2024-07-23 00:04:38,310 __main__ INFO Iter: 1320/ 2220, Total_Loss:0.2135, iou_loss:0.2003, sa_loss:0.0264, lr: 0.0001
+2024-07-23 00:04:50,035 __main__ INFO Epoch: 17, Miou: 0.5131193995475769, maxMiou: 0.5764448642730713
+2024-07-23 00:04:56,350 __main__ INFO Iter: 1340/ 2220, Total_Loss:0.2212, iou_loss:0.2083, sa_loss:0.0258, lr: 0.0001
+2024-07-23 00:05:08,906 __main__ INFO Iter: 1360/ 2220, Total_Loss:0.2224, iou_loss:0.2101, sa_loss:0.0244, lr: 0.0001
+2024-07-23 00:05:21,305 __main__ INFO Iter: 1380/ 2220, Total_Loss:0.2061, iou_loss:0.1918, sa_loss:0.0286, lr: 0.0001
+2024-07-23 00:05:33,798 __main__ INFO Iter: 1400/ 2220, Total_Loss:0.1942, iou_loss:0.1808, sa_loss:0.0267, lr: 0.0001
+2024-07-23 00:05:42,825 __main__ INFO Epoch: 18, Miou: 0.5542396306991577, maxMiou: 0.5764448642730713
+2024-07-23 00:05:52,978 __main__ INFO Iter: 1420/ 2220, Total_Loss:0.2137, iou_loss:0.2013, sa_loss:0.0247, lr: 0.0001
+2024-07-23 00:06:05,374 __main__ INFO Iter: 1440/ 2220, Total_Loss:0.1897, iou_loss:0.1781, sa_loss:0.0233, lr: 0.0001
+2024-07-23 00:06:17,901 __main__ INFO Iter: 1460/ 2220, Total_Loss:0.2364, iou_loss:0.2250, sa_loss:0.0227, lr: 0.0001
+2024-07-23 00:06:34,701 __main__ INFO Epoch: 19, Miou: 0.5373346209526062, maxMiou: 0.5764448642730713
+2024-07-23 00:06:35,731 __main__ INFO Iter: 1480/ 2220, Total_Loss:0.1838, iou_loss:0.1694, sa_loss:0.0288, lr: 0.0001
+2024-07-23 00:06:48,103 __main__ INFO Iter: 1500/ 2220, Total_Loss:0.1780, iou_loss:0.1649, sa_loss:0.0261, lr: 0.0001
+2024-07-23 00:07:00,663 __main__ INFO Iter: 1520/ 2220, Total_Loss:0.2027, iou_loss:0.1899, sa_loss:0.0255, lr: 0.0001
+2024-07-23 00:07:13,320 __main__ INFO Iter: 1540/ 2220, Total_Loss:0.1999, iou_loss:0.1874, sa_loss:0.0250, lr: 0.0001
+2024-07-23 00:07:25,861 __main__ INFO Epoch: 20, Miou: 0.5651635527610779, maxMiou: 0.5764448642730713
+2024-07-23 00:07:30,634 __main__ INFO Iter: 1560/ 2220, Total_Loss:0.1867, iou_loss:0.1755, sa_loss:0.0224, lr: 0.0001
+2024-07-23 00:07:43,188 __main__ INFO Iter: 1580/ 2220, Total_Loss:0.2014, iou_loss:0.1895, sa_loss:0.0237, lr: 0.0001
+2024-07-23 00:07:55,890 __main__ INFO Iter: 1600/ 2220, Total_Loss:0.1816, iou_loss:0.1706, sa_loss:0.0221, lr: 0.0001
+2024-07-23 00:08:08,375 __main__ INFO Iter: 1620/ 2220, Total_Loss:0.1639, iou_loss:0.1519, sa_loss:0.0240, lr: 0.0001
+2024-07-23 00:08:17,452 __main__ INFO Epoch: 21, Miou: 0.5607870817184448, maxMiou: 0.5764448642730713
+2024-07-23 00:08:26,113 __main__ INFO Iter: 1640/ 2220, Total_Loss:0.1388, iou_loss:0.1271, sa_loss:0.0236, lr: 0.0001
+2024-07-23 00:08:38,782 __main__ INFO Iter: 1660/ 2220, Total_Loss:0.1648, iou_loss:0.1535, sa_loss:0.0224, lr: 0.0001
+2024-07-23 00:08:51,192 __main__ INFO Iter: 1680/ 2220, Total_Loss:0.1446, iou_loss:0.1314, sa_loss:0.0262, lr: 0.0001
+2024-07-23 00:09:03,618 __main__ INFO Iter: 1700/ 2220, Total_Loss:0.1691, iou_loss:0.1575, sa_loss:0.0232, lr: 0.0001
+2024-07-23 00:09:09,485 __main__ INFO Epoch: 22, Miou: 0.5305895805358887, maxMiou: 0.5764448642730713
+2024-07-23 00:09:22,362 __main__ INFO Iter: 1720/ 2220, Total_Loss:0.1251, iou_loss:0.1136, sa_loss:0.0230, lr: 0.0001
+2024-07-23 00:09:34,758 __main__ INFO Iter: 1740/ 2220, Total_Loss:0.1331, iou_loss:0.1214, sa_loss:0.0233, lr: 0.0001
+2024-07-23 00:09:47,239 __main__ INFO Iter: 1760/ 2220, Total_Loss:0.1394, iou_loss:0.1274, sa_loss:0.0239, lr: 0.0001
+2024-07-23 00:10:02,209 __main__ INFO Epoch: 23, Miou: 0.5251059532165527, maxMiou: 0.5764448642730713
+2024-07-23 00:10:06,249 __main__ INFO Iter: 1780/ 2220, Total_Loss:0.1585, iou_loss:0.1474, sa_loss:0.0221, lr: 0.0001
+2024-07-23 00:10:18,588 __main__ INFO Iter: 1800/ 2220, Total_Loss:0.1350, iou_loss:0.1240, sa_loss:0.0220, lr: 0.0001
+2024-07-23 00:10:31,010 __main__ INFO Iter: 1820/ 2220, Total_Loss:0.1022, iou_loss:0.0902, sa_loss:0.0241, lr: 0.0001
+2024-07-23 00:10:43,622 __main__ INFO Iter: 1840/ 2220, Total_Loss:0.1253, iou_loss:0.1144, sa_loss:0.0219, lr: 0.0001
+2024-07-23 00:10:54,824 __main__ INFO Epoch: 24, Miou: 0.5455414056777954, maxMiou: 0.5764448642730713
+2024-07-23 00:11:02,030 __main__ INFO Iter: 1860/ 2220, Total_Loss:0.1291, iou_loss:0.1173, sa_loss:0.0236, lr: 0.0001
+2024-07-23 00:11:14,423 __main__ INFO Iter: 1880/ 2220, Total_Loss:0.1255, iou_loss:0.1134, sa_loss:0.0241, lr: 0.0001
+2024-07-23 00:11:26,944 __main__ INFO Iter: 1900/ 2220, Total_Loss:0.1067, iou_loss:0.0947, sa_loss:0.0240, lr: 0.0001
+2024-07-23 00:11:40,095 __main__ INFO Iter: 1920/ 2220, Total_Loss:0.1157, iou_loss:0.1057, sa_loss:0.0199, lr: 0.0001
+2024-07-23 00:11:46,259 __main__ INFO Epoch: 25, Miou: 0.5203384757041931, maxMiou: 0.5764448642730713
+2024-07-23 00:11:57,225 __main__ INFO Iter: 1940/ 2220, Total_Loss:0.1031, iou_loss:0.0923, sa_loss:0.0215, lr: 0.0001
+2024-07-23 00:12:09,761 __main__ INFO Iter: 1960/ 2220, Total_Loss:0.0975, iou_loss:0.0873, sa_loss:0.0205, lr: 0.0001
+2024-07-23 00:12:22,410 __main__ INFO Iter: 1980/ 2220, Total_Loss:0.1029, iou_loss:0.0930, sa_loss:0.0198, lr: 0.0001
+2024-07-23 00:12:37,632 __main__ INFO Epoch: 26, Miou: 0.5198403596878052, maxMiou: 0.5764448642730713
+2024-07-23 00:12:39,959 __main__ INFO Iter: 2000/ 2220, Total_Loss:0.1090, iou_loss:0.0972, sa_loss:0.0237, lr: 0.0001
+2024-07-23 00:12:52,486 __main__ INFO Iter: 2020/ 2220, Total_Loss:0.0799, iou_loss:0.0686, sa_loss:0.0227, lr: 0.0001
+2024-07-23 00:13:05,178 __main__ INFO Iter: 2040/ 2220, Total_Loss:0.0840, iou_loss:0.0737, sa_loss:0.0204, lr: 0.0001
+2024-07-23 00:13:17,578 __main__ INFO Iter: 2060/ 2220, Total_Loss:0.0919, iou_loss:0.0815, sa_loss:0.0208, lr: 0.0001
+2024-07-23 00:13:29,264 __main__ INFO Epoch: 27, Miou: 0.5298423171043396, maxMiou: 0.5764448642730713
+2024-07-23 00:13:35,356 __main__ INFO Iter: 2080/ 2220, Total_Loss:0.0773, iou_loss:0.0679, sa_loss:0.0187, lr: 0.0001
+2024-07-23 00:13:48,023 __main__ INFO Iter: 2100/ 2220, Total_Loss:0.0546, iou_loss:0.0434, sa_loss:0.0225, lr: 0.0001
+2024-07-23 00:14:00,425 __main__ INFO Iter: 2120/ 2220, Total_Loss:0.0884, iou_loss:0.0785, sa_loss:0.0198, lr: 0.0001
+2024-07-23 00:14:12,823 __main__ INFO Iter: 2140/ 2220, Total_Loss:0.0847, iou_loss:0.0751, sa_loss:0.0193, lr: 0.0001
+2024-07-23 00:14:21,612 __main__ INFO Epoch: 28, Miou: 0.5463483929634094, maxMiou: 0.5764448642730713
+2024-07-23 00:14:31,833 __main__ INFO Iter: 2160/ 2220, Total_Loss:0.0700, iou_loss:0.0608, sa_loss:0.0184, lr: 0.0001
+2024-07-23 00:14:44,192 __main__ INFO Iter: 2180/ 2220, Total_Loss:0.0614, iou_loss:0.0493, sa_loss:0.0240, lr: 0.0001
+2024-07-23 00:14:56,590 __main__ INFO Iter: 2200/ 2220, Total_Loss:0.0751, iou_loss:0.0663, sa_loss:0.0176, lr: 0.0001
+2024-07-23 00:15:14,508 __main__ INFO Epoch: 29, Miou: 0.5211980938911438, maxMiou: 0.5764448642730713
+2024-07-23 00:15:14,964 __main__ INFO best val Miou 0.5764448642730713 at peoch: 12
